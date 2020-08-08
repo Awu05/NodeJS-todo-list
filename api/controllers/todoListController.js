@@ -1,45 +1,31 @@
 "use strict";
 
-var mongoose = require("mongoose");
-var Task = mongoose.model("Tasks");
-
-exports.list_all_tasks = function (req, res) {
-  Task.find({}, function (err, task) {
-    if (err) res.send(err);
-    res.json(task);
+exports.list_all_tasks = function (req, res, database) {
+  database.list_all_tasks((results) => {
+    res.json(results);
   });
 };
 
-exports.create_a_task = function (req, res) {
-  var new_task = new Task(req.body);
-  new_task.save(function (err, task) {
-    if (err) res.send(err);
-    res.json(task);
+exports.create_a_task = function (req, res, database) {
+  database.create_a_task(req.body.name, () => {
+    res.json('Successfully added!');
   });
 };
 
-exports.read_a_task = function (req, res) {
-  Task.findById(req.params.taskId, function (err, task) {
-    if (err) res.send(err);
-    res.json(task);
+exports.get_a_task = function (req, res, database) {
+  database.get_a_task(req.params.taskId, (result) => {
+    res.json(result);
   });
 };
-
-exports.update_a_task = function (req, res) {
-  Task.findOneAndUpdate(
-    { _id: req.params.taskId },
-    req.body,
-    { new: true },
-    function (err, task) {
-      if (err) res.send(err);
-      res.json(task);
-    }
-  );
+  
+exports.update_a_task = function (req, res, database) {
+  database.update_a_task(req, () => {
+    res.json('Successfully updated task!');
+  })
 };
 
-exports.delete_a_task = function (req, res) {
-  Task.remove({ _id: req.params.taskId }, function (err, task) {
-    if (err) res.send(err);
-    res.json({ message: "Task successfully deleted" });
+exports.delete_a_task = function (req, res, database) {
+  database.delete_a_task(req.params.taskId, () => {
+    res.json('Successfully deleted task!');
   });
 };
